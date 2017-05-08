@@ -1,9 +1,11 @@
 #!/bin/sh
 
 port=8381
-sleep_time=5
-max_bandwidth=102400
+sleep_time=30
+max_bandwidth=1024000
 basepath=`dirname $0`
+
+sleep 10
 
 file_bandwidth=0
 for i in `cat $basepath/shadowsocks_$port.log`;
@@ -16,18 +18,18 @@ if [ "$file_bandwidth" -gt "$max_bandwidth" ]; then
 echo "exit"
 exit
 else
-dpt_string=`sudo iptables -vxn -L | grep -i "dpt:$port"`
+dpt_string=`iptables -vxn -L | grep -i "dpt:$port"`
 if [ ! -n "$dpt_string" ]; then
-`sudo iptables -I INPUT -p tcp --dport $port -j ACCEPT`
-`sudo iptables -I OUTPUT -p tcp --sport $port`
+`iptables -I INPUT -p tcp --dport $port -j ACCEPT`
+`iptables -I OUTPUT -p tcp --sport $port`
 fi
 fi
 
 while true
 do
 count_bandwidth=$file_bandwidth
-dpt_bandwidth=`sudo iptables -vxn -L | grep -i "dpt:$port" | awk '{print $2}'`
-spt_bandwidth=`sudo iptables -vxn -L | grep -i "spt:$port" | awk '{print $2}'`
+dpt_bandwidth=`iptables -vxn -L | grep -i "dpt:$port" | awk '{print $2}'`
+spt_bandwidth=`iptables -vxn -L | grep -i "spt:$port" | awk '{print $2}'`
 echo "dpt_bandwidth :$dpt_bandwidth"
 echo "spt_bandwidth :$spt_bandwidth"
 let "count_bandwidth+=dpt_bandwidth"
@@ -38,8 +40,8 @@ echo "count bandwidth :$count_bandwidth"
 echo "write file $basepath/shadowsocks_$port.log"
 
 if [ "$count_bandwidth" -gt "$max_bandwidth" ]; then
-`sudo iptables -D INPUT -p tcp --dport $port -j ACCEPT`
-`sudo iptables -D OUTPUT -p tcp --sport $port`
+`iptables -D INPUT -p tcp --dport $port -j ACCEPT`
+`iptables -D OUTPUT -p tcp --sport $port`
 echo "port delete: $port"
 exit
 fi
