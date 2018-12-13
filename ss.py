@@ -14,7 +14,7 @@ if sys.argv[1] == 'add':
             port_password[sys.argv[2]] = sys.argv[3]
             print('add port:%s password:%s' %(sys.argv[2], sys.argv[3]))
             with open("/etc/shadowsocks.json",'w') as dump_f:
-                json.dump(load_dict, dump_f, indent=4)
+                json.dump(load_dict, dump_f, indent=4, sort_keys=True)
             exit(0)
         else:
             print('port in [1-65535]')
@@ -31,7 +31,7 @@ elif sys.argv[1] == 'remove':
             del port_password[sys.argv[2]]
             print('remove port:%s' %(sys.argv[2]))
             with open("/etc/shadowsocks.json",'w') as dump_f:
-                json.dump(load_dict, dump_f, indent=4)
+                json.dump(load_dict, dump_f, indent=4, sort_keys=True)
             exit(0)
         else:
             print('port in [1-65535]')
